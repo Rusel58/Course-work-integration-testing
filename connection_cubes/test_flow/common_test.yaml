@@ -1,0 +1,27 @@
+service: sdc_ci
+title: SDC releases test flows
+
+ci:
+  secret:
+  runtime:
+    get-output-on-fail: true
+
+  includes:
+    daily_car_hil_test: hils/hil_car.yaml
+    open_loop: simulator/open_loop.yaml
+
+  releases:
+
+  actions:
+    localization_ol_action:
+      extends: open_loop#/any/actions/localization_ol_action
+
+    hil_car_test_daily:
+      extends: daily_car_hil_test#/any/actions/hil_test_daily
+
+  flows:
+    localization_ol_flow:
+      extends: open_loop#/any/flows/localization_ol_flow
+
+    run_car_hil_tests_flow:
+      extends: daily_car_hil_test#/any/flows/run_car_hil_tests_flow

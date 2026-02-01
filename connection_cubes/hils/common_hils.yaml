@@ -1,0 +1,19 @@
+service:
+title:
+
+ci:
+  secret:
+
+  runtime:
+    get-output-on-fail: true
+
+  includes:
+    car_hils_checks: hils/hil_car.yaml
+
+  actions:
+    hil_car_test_daily:
+      extends: car_hils_checks#/any/actions/hil_test_daily
+
+  flows:
+    run_car_hil_tests_flow:
+      extends: car_hils_checks#/any/flows/run_car_hil_tests_flow

@@ -1,0 +1,23 @@
+any:
+  actions:
+    hil_test_daily:
+      title:
+      description:
+      flow: run_car_hil_tests_flow
+
+  flows:
+    run_car_hil_tests_flow:
+      jobs:
+        flow_started:
+          title: Flow started
+          task:
+
+        hil_control_test_daily:
+          title:
+          task:
+          if: ${not_null(flow-vars.hil_checks.all || flow-vars.hil_checks.base.all || flow-vars.hil_checks.base.hil_control_test, `false`)}
+          attempts:
+          needs:
+          input:
+            api_type: ${not_null(flow-vars.api_type, 'stable')}
+          tags: pinned

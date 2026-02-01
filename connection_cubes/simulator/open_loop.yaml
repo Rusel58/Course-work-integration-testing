@@ -1,0 +1,32 @@
+any:
+  poll_duration_23h: &poll_duration_23h 82800  # 23 hours
+
+  # Common flow-vars patterns
+  base_ol_flow_vars: &base_ol_flow_vars
+    dry_run: false
+
+  actions:
+    localization_ol_action:
+      title:
+      description:
+      flow: localization_ol_flow
+      flow-vars:
+        <<: *base_ol_flow_vars
+        localization_qa:
+        simulator_pool_id:
+        task_title:
+        comment_type:
+
+  flows:
+    localization_ol_flow:
+      title:
+      jobs:
+        run_localization_ol_metrics:
+          title:
+          task:
+          attempts:
+          input:
+            dry_run: ${flow-vars.dry_run}
+            nirvana_token_with_key:
+            poll_duration: *poll_duration_23h
+          tags: pinned

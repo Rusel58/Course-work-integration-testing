@@ -1,0 +1,21 @@
+service:
+title:
+
+ci:
+  secret:
+
+  runtime:
+    get-output-on-fail: true
+
+  permissions:
+
+  includes:
+    open_loop_simulator: simulator/open_loop.yaml
+
+  actions:
+    localization_ol_action:
+      extends: open_loop_simulator#/any/actions/localization_ol_action
+
+  flows:
+    localization_ol_flow:
+      extends: open_loop_simulator#/any/flows/localization_ol_flow

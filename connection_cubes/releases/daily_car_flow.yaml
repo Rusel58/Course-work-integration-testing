@@ -1,0 +1,105 @@
+any:
+  common_hil_flow_vars: &common_hil_flow_vars >-
+    {
+      "test_mode": ${flow-vars.test-mode},
+      "api_type": "${flow-vars.lite_agent_api.api_type}"
+    }
+
+  common_action_config: &common_action_config
+    action_config:
+    cancel_on_interrupt: true
+    execution_timeout: 23h
+    on_restart:
+
+  hil_specific: &hil_specific
+    action_path: ${flow-vars.subflow_path.hils}
+    flow_vars: *common_hil_flow_vars
+
+  releases:
+    car_midnight_qcd_release:
+      title: '[CAR] Daily'
+      flow: car_midnight_qcd_flow
+      description:
+      flow-vars:
+        lite_agent_api:
+          api_type: 'stable'
+        subflow_path:
+          simulator: 'simulator'
+          hils: 'hils'
+          common_checks:
+        test-mode: false
+
+    car_midnight_qcd_release_test_circuit:
+      title: '[CAR][TEST] Daily'
+      tags:
+      description:
+      flow: car_midnight_qcd_flow
+      flow-vars: &car_midnight_qcd_test_flow_vars
+        lite_agent_api:
+          api_type: 'dry-run'
+        subflow_path:
+          simulator: 'test_flow'
+          hils: 'test_flow'
+          common_checks: 'test_flow'
+        test-mode: true
+
+
+  actions:
+    test_car_daily_qcd_circuit:
+      title: '[CAR][TEST] Daily'
+      tags:
+        - OWNER:CI
+        - SDC_STABILITY_AUTO_CLOSE:SDC-160253
+      description: |
+        Тестирует создание релиза
+        <INTERNAL_URL>
+      flow: car_midnight_qcd_flow
+      flow-vars: *car_midnight_qcd_test_flow_vars
+      triggers:
+        - on:
+          on-demand: true
+          required: never
+          filters:
+            - abs-paths:
+                - 'daily_car_release.yaml'
+                - 'common_test.yaml'
+
+  flows:
+    car_midnight_qcd_flow:
+      title: '[CAR] Daily + QCD Release'
+      jobs:
+        start:
+          title: Start
+          task: dummy
+          stage: start
+
+        preparation_started:
+          title: Stage 'Preparation' started
+          task: dummy
+          stage: preparation
+          needs:
+            - start
+
+        run_localization_ol_action:
+          title:
+          task:
+          needs:
+          input:
+            config:
+              <<: *common_action_config
+              action_id: localization_ol_action
+              action_path: ${flow-vars.subflow_path.simulator}
+              flow_vars: >-
+                {
+                  "dry_run": ${flow-vars.test-mode}
+                }
+
+        run_hil_tests:
+          title:
+          task: run_ci_action
+          needs:
+          input:
+            config:
+              <<: *common_action_config
+              <<: *hil_specific
+              action_id: hil_car_test_daily
